@@ -1,0 +1,116 @@
+Here is a detailed tutorial on how to set up a 
+WireGuard server on a Raspberry Pi and how to reach it from the outside, even 
+outside, even without a static public IP address:
+
+
+Step 1: Set up WireGuard server on Raspberry Pi
+Make sure your Raspberry Pi is updated with the latest operating system. 
+Open a terminal and run the following commands to update the system:
+
+// 
+sudo apt update
+sudo apt upgrade
+//
+
+Step 2: Install WireGuard on the Raspberry Pi by running the following command:
+//
+sudo apt install wireguard
+//
+
+Step 3: Create a key pair for the WireGuard server with the following command:
+//
+wg genkey | sudo tee /etc/wireguard/privatekey | wg pubkey | sudo tee /etc/wireguard/publickey
+//
+This command generates a private and a public key file in the /etc/wireguard/ directory. The private key file is stored as privatekey and the public key file is stored as publickey.
+
+    
+Step 4: Create a configuration file for the WireGuard server by creating a new file named wg0.conf in the /etc/wireguard/ directory:
+//
+sudo nano /etc/wireguard/wg0.conf
+//
+
+Step 5: Add the following content to the wg0.conf file:
+//
+[Interface]
+PrivateKey = <Hier die private Schlüsselgeneriert bei Schritt 3>
+Address = 10.0.0.1/24
+ListenPort = 51820
+
+[Peer]
+PublicKey = <Hier die öffentliche Schlüsselgeneriert bei Schritt 3>
+AllowedIPs = 10.0.0.2/32
+//
+
+Step 6: Replace <here the private key generated at step 3> with the contents of the file /etc/wireguard/privatekey and <here the public key generated at step 3> with the contents of the file /etc/wireguard/publickey.
+
+  1. Save and close the wg0.conf file.
+
+  2. Enable the WireGuard service with the following command:
+
+//
+sudo systemctl enable --now wg-quick@wg0
+//
+
+Step 7: The WireGuard server is now set up on your Raspberry Pi.
+
+Step 8: Set up dynamic DNS service
+
+ 1.   Register with a dynamic DNS service provider of your choice. Popular providers are DynDNS, No-IP and DuckDNS. Go to the provider's website and create an account.
+
+ 2.   After you register, create a hostname with your dynamic DNS provider. This hostname will be associated with your changing public IP address.
+
+ 3.   Install the dynamic DNS client on the Raspberry Pi. Here is an example of how to install the DuckDNS client:
+
+//
+sudo apt install curl
+mkdir duckdns
+cd duckdns
+nano duck.sh
+//
+
+Step 9: Add the following content to the duck.sh script:
+//
+echo url="https://www.duckdns.org/update?domains=<DEIN_HOSTNAME>&token=<DEIN_TOKEN>&ip=" | curl -k -o ~/duckdns/duck.log -K -
+//
+
+Step 10: Replace <YOUR_HOSTNAME> with the hostname you created with your dynamic DNS provider and <YOUR_TOKEN> with the API token you received from your dynamic DNS provider.
+
+ 1.   Save and close the duck.sh script.
+
+ 2.   Make the script executable:
+ //
+ chmod +x duck.sh
+//
+
+Step 11: Test the script to make sure it updates the IP address:
+//
+./duck.sh
+//
+
+Step 12: The script should update the IP address and issue a confirmation.
+
+    Set up a cron job to run the script periodically and update the IP address:
+//
+    crontab -e
+//
+
+Step 13: Add the following line to the end of the file to run the script every 5 minutes:
+//
+*/5 * * * * /home/pi/duckdns/duck.sh >/dev/null 2>&1
+//
+
+Step 14: Save and close the cron job configuration file.
+
+The dynamic DNS client is now installed and configured on the Raspberry Pi to update your IP address regularly.
+
+Step 15: Configure port forwarding in the router
+
+    Open a web browser and enter the IP address of your router. Log in with your credentials.
+
+    Look for the settings for port forwarding or NAT (Network Address Translation). The exact location may vary depending on your router model. Consult your router's documentation or search online for specific instructions for your router.
+
+    Configure port forwarding to forward incoming WireGuard traffic to the Raspberry Pi. Open UDP port 51820 and forward traffic to the Raspberry Pi's internal IP address (usually 10.0.0.1, as configured in the wg0.conf file).
+
+    Save the settings in the router.
+
+Your WireGuard server on the Raspberry Pi should now be reachable from the outside using the DNS name you created with the dynamic DNS provider, even if you don't have a static public IP address. Make sure that your Raspberry Pi is turned on and that the dynamic DNS client regularly updates the IP address to ensure reachability.

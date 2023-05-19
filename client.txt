@@ -1,0 +1,34 @@
+Here is a sample configuration file for the WireGuard client on Windows, based on the information from the rpi-server tutorial:
+//
+[Interface]
+PrivateKey = <Hier den privaten Schlüssel des Windows-Clients einfügen>
+Address = 10.0.0.2/24
+DNS = 8.8.8.8
+
+[Peer]
+PublicKey = <Hier den öffentlichen Schlüssel des Raspberry Pi einfügen>
+Endpoint = <Hier den DNS-Namen des dynamischen DNS-Anbieters einfügen>:51820
+AllowedIPs = 0.0.0.0/0, ::/0
+//
+
+Here is what you can do to use the configuration:
+
+    Replace <insert Windows client private key here> with the private key of the WireGuard client on your Windows system. You can generate a private key for the Windows client or use the private key already generated.
+
+    Replace <insert Raspberry Pi public key here> with the public key you generated when setting up the WireGuard server on the Raspberry Pi. You can copy and paste the public key from the /etc/wireguard/publickey file on the Raspberry Pi.
+
+    Replace <paste here the DNS name of the dynamic DNS provider> with the DNS name you created with your dynamic DNS provider. Make sure you use the full DNS name including the domain extension (e.g. example.duckdns.org).
+
+    Save the configuration file with the .conf extension (e.g. wg-client.conf) on your Windows system.
+
+    Install the WireGuard software for Windows from the official website (https://www.wireguard.com/install/).
+
+    Open the WireGuard app on your Windows system.
+
+    Click on the "+" icon in the app and select "Import tunnel".
+
+    Select the configuration file (wg-client.conf) you created earlier and import it into the app.
+
+    Click on the imported tunnel and then on "Connect" to connect to the WireGuard server on the Raspberry Pi.
+
+This should allow you to set up the WireGuard client on your Windows system to connect to the WireGuard server on the Raspberry Pi. Make sure that you update the configuration file according to your specific keys, DNS names, and IP addresses.
